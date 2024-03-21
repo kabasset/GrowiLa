@@ -102,7 +102,7 @@ template <>
 void Pipeline::evaluate_impl<Growing>()
 {
   if (m_radius > 0) {
-    dilate(m_detected, m_radius, m_grown);
+    grow(m_detected, m_radius, m_grown);
   }
 }
 

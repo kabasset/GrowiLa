@@ -12,7 +12,6 @@ namespace GrowiLa {
 
 /**
  * @brief Compute the isotropic Laplacian of an image.
- * @tparam T The output pixel type
  */
 template <typename TIn, typename TOut>
 void laplacian(const TIn& in, TOut& out)
@@ -25,8 +24,18 @@ void laplacian(const TIn& in, TOut& out)
 }
 
 /**
+ * @brief Blur an image with a box of given radius.
+ */
+template <typename TIn, typename TOut>
+void blur(const TIn& in, Linx::Index radius, TOut& out)
+{
+  using T = typename TOut::Value;
+  auto filter = Linx::mean_filter<T>(Linx::Box<2>::from_center(radius)); // FIXME L2-ball?
+  filter.transform(Linx::extrapolation<Linx::Nearest>(in), out); // FIXME filter.transform<Nearest>(in, out)
+}
+
+/**
  * @brief Dilate an image with a box of given radius.
- * @tparam T The output pixel type
  */
 template <typename TIn, typename TOut>
 void dilate(const TIn& in, Linx::Index radius, TOut& out)
@@ -37,15 +46,30 @@ void dilate(const TIn& in, Linx::Index radius, TOut& out)
 }
 
 /**
- * @brief Blur an image with a box of given radius.
- * @tparam T The output pixel type
+ * @brief Erode an image with a box of given radius.
  */
 template <typename TIn, typename TOut>
-void blur(const TIn& in, Linx::Index radius, TOut& out)
+void erode(const TIn& in, Linx::Index radius, TOut& out)
 {
   using T = typename TOut::Value;
-  auto filter = Linx::mean_filter<T>(Linx::Box<2>::from_center(radius)); // FIXME L2-ball?
+  auto filter = Linx::erosion<T>(Linx::Box<2>::from_center(radius)); // FIXME L2-ball?
   filter.transform(Linx::extrapolation<Linx::Nearest>(in), out); // FIXME filter.transform<Nearest>(in, out)
+}
+
+/**
+ * @brief Dilate and then erode an image with a box of given radius and then radius - 1.
+ */
+template <typename TIn, typename TOut>
+void grow(const TIn& in, Linx::Index radius, TOut& out)
+{
+  using T = typename TOut::Value;
+  if (radius > 1) {
+    Linx::Raster<T> dilated(in.shape());
+    dilate(in, radius, dilated);
+    erode(dilated, radius - 1, out);
+  } else {
+    dilate(in, 1, out);
+  }
 }
 
 } // namespace GrowiLa

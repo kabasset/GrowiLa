@@ -15,15 +15,15 @@ int main(int argc, char const* argv[])
   Linx::ProgramOptions options;
   options.positional<std::string>("input", "The input data file name");
   options.positional<std::string>("output", "The output mask file name");
-  options.named("hdu,i", "The 0-based input HDU index slice", 0L);
-  options.named("pfa,p", "The detection probability of false alarm", 0.01);
-  options.flag("dilate", "Enable dilation");
+  options.named<Linx::Index>("hdu,i", "The 0-based input HDU index slice", 0);
+  options.named<double>("pfa,p", "The detection probability of false alarm", 0.01);
+  options.named<Linx::Index>("radius,r", "The growing radius", 0);
   options.parse(argc, argv);
   Linx::Fits data_fits(options.as<std::string>("input"));
   Linx::Fits map_fits(options.as<std::string>("output"));
   const auto hdu = options.as<Linx::Index>("hdu");
   const auto pfa = options.as<double>("pfa");
-  const auto radius = options.has("dilate");
+  const auto radius = options.as<Linx::Index>("radius");
 
   std::cout << "Reading data: " << data_fits.path() << std::endl;
   auto data = data_fits.read<Linx::Raster<float>>(hdu);
