@@ -41,7 +41,7 @@ template <typename TIn, typename TOut>
 void dilate(const TIn& in, Linx::Index radius, TOut& out)
 {
   using T = typename TOut::Value;
-  auto filter = Linx::dilation<T>(Linx::Box<2>::from_center(radius)); // FIXME L2-ball?
+  auto filter = Linx::binary_dilation<T>(Linx::Box<2>::from_center(radius)); // FIXME L2-ball?
   filter.transform(Linx::extrapolation<Linx::Nearest>(in), out); // FIXME filter.transform<Nearest>(in, out)
 }
 
@@ -52,8 +52,8 @@ template <typename TIn, typename TOut>
 void erode(const TIn& in, Linx::Index radius, TOut& out)
 {
   using T = typename TOut::Value;
-  auto filter = Linx::erosion<T>(Linx::Box<2>::from_center(radius)); // FIXME L2-ball?
-  filter.transform(Linx::extrapolation<Linx::Nearest>(in), out); // FIXME filter.transform<Nearest>(in, out)
+  auto filter = Linx::binary_erosion<T>(Linx::Box<2>::from_center(radius)); // FIXME L2-ball?
+  filter.transform(Linx::extrapolation(in), out); // FIXME filter.transform<Nearest>(in, out)
 }
 
 /**

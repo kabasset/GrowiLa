@@ -36,7 +36,8 @@ int main(int argc, char const* argv[])
   std::cout << "  - Detection: " << pipeline.milliseconds<Detection>() << std::endl;
   std::cout << "  - Growing: " << pipeline.milliseconds<Growing>() << std::endl;
 
-  map_fits.write(map, 'x');
+  Linx::Raster<char> map_as_char(map.shape(), map);
+  map_fits.write(map_as_char, 'x');
   std::cout << "Saved map as: " << map_fits.path() << std::endl;
 
   return 0;

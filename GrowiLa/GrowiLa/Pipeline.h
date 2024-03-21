@@ -18,7 +18,7 @@ using Pixel = float;
 /**
  * @brief The flag type.
  */
-using Flag = char;
+using Flag = bool;
 
 /**
  * @brief The detection pipeline.
