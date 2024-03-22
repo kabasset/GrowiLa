@@ -31,6 +31,8 @@ public:
       m_radius(radius)
   {}
 
+protected:
+
   /**
    * @brief Evaluate a given step.
    */
@@ -41,7 +43,7 @@ public:
    * @brief Get the result of a given step.
    */
   template <typename S>
-  typename S::Return get_impl();
+  typename S::Value get_impl();
 
 private:
 
@@ -57,7 +59,7 @@ private:
 /**
  * @brief The enhancement step.
  */
-struct Enhancement : Linx::PipelineStep<void, const Linx::Raster<Pixel>&> {};
+struct Enhancement : Linx::PipelineStep<const Linx::Raster<Pixel>&()> {};
 
 template <>
 void Pipeline::evaluate_impl<Enhancement>()
@@ -66,7 +68,7 @@ void Pipeline::evaluate_impl<Enhancement>()
 }
 
 template <>
-Enhancement::Return Pipeline::get_impl<Enhancement>()
+Enhancement::Value Pipeline::get_impl<Enhancement>()
 {
   return m_enhanced;
 }
@@ -74,7 +76,7 @@ Enhancement::Return Pipeline::get_impl<Enhancement>()
 /**
  * @brief The detection step.
  */
-struct Detection : Linx::PipelineStep<Enhancement, const Linx::Raster<Flag>&> {};
+struct Detection : Linx::PipelineStep<const Linx::Raster<Flag>&(Enhancement)> {};
 
 template <>
 void Pipeline::evaluate_impl<Detection>()
@@ -88,7 +90,7 @@ void Pipeline::evaluate_impl<Detection>()
 }
 
 template <>
-Detection::Return Pipeline::get_impl<Detection>()
+Detection::Value Pipeline::get_impl<Detection>()
 {
   return m_detected;
 }
@@ -96,7 +98,7 @@ Detection::Return Pipeline::get_impl<Detection>()
 /**
  * @brief The growing step.
  */
-struct Growing : Linx::PipelineStep<Detection, const Linx::Raster<Flag>&> {};
+struct Growing : Linx::PipelineStep<const Linx::Raster<Flag>&(Detection)> {};
 
 template <>
 void Pipeline::evaluate_impl<Growing>()
@@ -107,7 +109,7 @@ void Pipeline::evaluate_impl<Growing>()
 }
 
 template <>
-Growing::Return Pipeline::get_impl<Growing>()
+Growing::Value Pipeline::get_impl<Growing>()
 {
   return m_radius > 0 ? m_grown : m_detected;
 }
