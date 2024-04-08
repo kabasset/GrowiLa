@@ -53,13 +53,14 @@ template <typename TIn, typename TOut>
 void dilate_sparse(const TIn& in, Linx::Index radius, TOut& out)
 {
   auto patch = out(Linx::Mask<2>::ball<1>(radius));
-  for (const auto& p : in.domain() - Linx::Box<2>::from_center(1)) {
+  for (const auto& p : in.domain() - Linx::Box<2>::from_center(radius)) {
     if (in[p]) {
       patch >>= p;
       patch.fill(true);
       patch <<= p;
     }
   }
+  // FIXME handle borders
 }
 
 /**
@@ -82,7 +83,7 @@ void grow(const TIn& in, Linx::Index radius, TOut& out)
   using T = typename TOut::Value;
   if (radius > 1) {
     Linx::Raster<T> dilated(in.shape());
-    dilate(in, radius, dilated);
+    dilate_sparse(in, radius, dilated);
     erode(dilated, radius - 1, out);
   } else {
     dilate_sparse(in, 1, out);
